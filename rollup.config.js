@@ -12,6 +12,11 @@ export default {
       file: 'dist/index.js',
       format: 'cjs',
     },
+    {
+      file: 'dist/index.umd.js',
+      format: 'umd',
+      name: 'CogniSelect',
+    },
   ],
   plugins: [resolve(), typescript()],
 }; 
