@@ -1,0 +1,32 @@
+{
+    "name": "cogniselect-sdk",
+    "version": "0.1.0",
+    "description": "Browser SDK for CogniSelect – context-menu AI features",
+    "main": "dist/index.js",
+    "module": "dist/index.esm.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "rollup -c"
+    },
+    "files": [
+        "dist"
+    ],
+    "keywords": [
+        "ai",
+        "context-menu",
+        "sdk",
+        "browser",
+        "typescript"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "@mlc-ai/web-llm": "^0.2.79"
+    },
+    "devDependencies": {
+        "@rollup/plugin-node-resolve": "^15.0.0",
+        "rollup": "^3.0.0",
+        "rollup-plugin-typescript2": "^0.32.0",
+        "typescript": "^5.0.0"
+    }
+}
