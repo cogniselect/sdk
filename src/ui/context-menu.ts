@@ -41,6 +41,16 @@ export class ContextMenuUI {
       boxSizing: 'border-box',
     });
 
+    // Add tip for context menu usage
+    const tipEl = createStyledElement('div', {
+      fontSize: '12px',
+      color: '#555',
+      fontStyle: 'italic',
+      fontWeight: 'bold',
+      marginBottom: '8px',
+    }, 'Tip: Highlight text and right-click to reveal CogniSelect menu');
+    container.appendChild(tipEl);
+
     const title = createStyledElement('div', {
       fontSize: '12px',
       fontWeight: '500',

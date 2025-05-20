@@ -39,6 +39,7 @@ export class StatusMenuUI {
       padding: '8px',
       fontFamily: 'Arial, sans-serif',
       minWidth: '200px',
+      maxWidth: '150px',
     }) as HTMLDivElement;
 
     if (!isInitialized) {
@@ -113,7 +114,12 @@ export class StatusMenuUI {
             statusEl.textContent = 'Status: Running';
           }
           
-          // Hide progress, it's complete
+          // Show the tip now that the model is running
+          const tipElDynamic = menu.querySelector<HTMLElement>('.status-tip');
+          if (tipElDynamic) {
+            tipElDynamic.style.display = 'block';
+          }
+          // Hide progress bar after loading completes
           if (StatusMenuUI.progressContainer) {
             StatusMenuUI.progressContainer.style.display = 'none';
           }
@@ -191,6 +197,20 @@ export class StatusMenuUI {
     }, statusText);
     statusEl.classList.add('status-text');
     menu.appendChild(statusEl);
+
+    // Tip under status (wrapped) that toggles visibility
+    const tipEl = createStyledElement('div', {
+      padding: '8px',
+      fontSize: '12px',
+      color: '#555',
+      whiteSpace: 'normal',
+      fontWeight: 'bold',
+      overflowWrap: 'break-word',
+      wordBreak: 'break-word',
+    }, 'Tip: Highlight text and right-click to reveal CogniSelect menu');
+    tipEl.classList.add('status-tip');
+    tipEl.style.display = isInitialized ? 'block' : 'none';
+    menu.appendChild(tipEl);
 
     document.body.appendChild(menu);
     StatusMenuUI.menuElement = menu;
