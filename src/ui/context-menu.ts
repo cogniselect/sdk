@@ -41,23 +41,6 @@ export class ContextMenuUI {
       boxSizing: 'border-box',
     });
 
-    // Add tip for context menu usage
-    const tipEl = createStyledElement('div', {
-      fontSize: '12px',
-      color: '#555',
-      fontStyle: 'italic',
-      fontWeight: 'bold',
-      marginBottom: '8px',
-    }, 'Tip: Highlight text and right-click to reveal CogniSelect menu');
-    container.appendChild(tipEl);
-
-    const title = createStyledElement('div', {
-      fontSize: '12px',
-      fontWeight: '500',
-      textTransform: 'uppercase',
-      marginBottom: '8px',
-    }, 'COGNISELECT ANALYSIS');
-    container.appendChild(title);
 
     const groups: Record<string, Action[]> = {};
 
@@ -158,6 +141,16 @@ export class ContextMenuUI {
     // The main container (first child) holds the menu items and will be locked to its current width
     const container = menuEl.firstElementChild as HTMLElement;
     if (!container) return;
+    // Helper to keep menu within viewport
+    const repositionMenu = () => {
+      const rect = menuEl.getBoundingClientRect();
+      let top = rect.top;
+      let left = rect.left;
+      if (rect.bottom > window.innerHeight) top = Math.max(0, window.innerHeight - rect.height);
+      if (rect.right > window.innerWidth) left = Math.max(0, window.innerWidth - rect.width);
+      menuEl.style.top = `${top}px`;
+      menuEl.style.left = `${left}px`;
+    };
     // Lock container width to prevent expansion
     const initialRect = container.getBoundingClientRect();
     container.style.width = `${initialRect.width}px`;
@@ -253,6 +246,8 @@ export class ContextMenuUI {
     container.appendChild(section);
     // Scroll container so newly appended section (including the input) is visible
     container.scrollTop = container.scrollHeight;
+    // Reposition menu to keep it within the viewport
+    repositionMenu();
     
     // Initial stream into resultContainer
     try {
@@ -267,6 +262,8 @@ export class ContextMenuUI {
       }
       // Add assistant's initial response to history
       ContextMenuUI.messageHistory.push({ role: 'assistant', content: full });
+      // Reposition menu after streaming response to keep it within the viewport
+      repositionMenu();
     } catch (e) {
       resultContainer.textContent = `Error: ${e instanceof Error ? e.message : String(e)}`;
     }
@@ -287,6 +284,7 @@ export class ContextMenuUI {
       }, `Processing follow-up question...`);
       section.insertBefore(fProc, hr2);
       container.scrollTop = container.scrollHeight;
+      repositionMenu();
       // Divider
       const fHr = document.createElement('hr'); fHr.style.margin = '6px 0'; section.insertBefore(fHr, hr2);
       // New result block
@@ -304,6 +302,7 @@ export class ContextMenuUI {
       });
       section.insertBefore(fResult, hr2);
       container.scrollTop = container.scrollHeight;
+      repositionMenu();
       // Send follow-up
       try {
         // Add follow-up question to history and send full conversation
@@ -317,6 +316,7 @@ export class ContextMenuUI {
           fResult.innerHTML = html2;
           fResult.scrollTop = fResult.scrollHeight;
           container.scrollTop = container.scrollHeight;
+          repositionMenu();
         }
         // Add assistant's follow-up response to history
         ContextMenuUI.messageHistory.push({ role: 'assistant', content: ans });
