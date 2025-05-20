@@ -265,19 +265,30 @@ export class StatusMenuUI {
     statusEl.classList.add('status-text');
     menu.appendChild(statusEl);
 
-    // Tip under status (wrapped) that toggles visibility
-    const tipEl = createStyledElement('div', {
-      padding: '8px',
-      fontSize: '12px',
-      color: '#555',
-      whiteSpace: 'normal',
-      fontWeight: 'bold',
-      overflowWrap: 'break-word',
-      wordBreak: 'break-word',
-    }, 'Tip: Highlight text and right-click to reveal CogniSelect menu');
-    tipEl.classList.add('status-tip');
-    tipEl.style.display = isInitialized ? 'block' : 'none';
-    menu.appendChild(tipEl);
+    // Only show tips and divider if tips are to be shown (i.e., initialized)
+    let tipsDivider: HTMLHRElement | null = null;
+    let tipsContainer: HTMLDivElement | null = null;
+
+    if (isInitialized) {
+      tipsDivider = document.createElement('hr');
+      menu.appendChild(tipsDivider);
+
+      // Show tips as a single line, 3 sentences
+      tipsContainer = createStyledElement('div', {
+        padding: '8px',
+        fontSize: '12px',
+        color: '#555',
+        whiteSpace: 'normal',
+        fontWeight: 'bold',
+        overflowWrap: 'break-word',
+        wordBreak: 'break-word',
+        margin: '0'
+      }) as HTMLDivElement;
+      tipsContainer.classList.add('status-tip');
+      tipsContainer.innerHTML =
+        'Highlight text and right-click to reveal the CogniSelect menu.<br><br>You can also right-click on any input to generate content.<br><br><center>For more information visit <a href="https://cogniselect.com" target="_blank" rel="noopener noreferrer" style="color:#0074d9;text-decoration:underline;font-weight:bold;">cogniselect.com</a></center>';
+      menu.appendChild(tipsContainer);
+    }
 
     document.body.appendChild(menu);
     StatusMenuUI.menuElement = menu;

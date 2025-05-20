@@ -20,7 +20,7 @@ export class IndicatorUI {
       background: '#fff',
       borderRadius: '8px',
       padding: '8px 12px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.22), 0 3px 16px rgba(0,0,0,0.16), 0 1.5px 8px rgba(0,0,0,0.12)',
       fontFamily: 'Arial, sans-serif',
       color: '#000',
       cursor: 'pointer',
@@ -33,11 +33,11 @@ export class IndicatorUI {
       borderRadius: '50%',
       background: '#fff',
       border: '2px solid #000',
-      boxShadow: '0 0 4px rgba(0,0,0,0.1)',
+      boxShadow: '0 2px 12px rgba(0,0,0,0.18)',
     });
 
     const status = createStyledElement('div', {
-      fontSize: '12px',
+      fontSize: '15px',
       color: '#555',
     }, 'CogniSelect');
 
