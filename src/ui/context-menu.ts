@@ -4,6 +4,7 @@ import { createStyledElement } from './dom-utils';
 export class ContextMenuUI {
   private static menuElement: HTMLElement | null = null;
   private static resultPanel: HTMLElement | null = null;
+  private static subMenuElement: HTMLElement | null = null;
   private static messageHistory: {role: string, content: string}[] = [];
   private static followupCount: number = 0;
   private static currentAction: Action | null = null;
@@ -41,7 +42,6 @@ export class ContextMenuUI {
       boxSizing: 'border-box',
     });
 
-
     const groups: Record<string, Action[]> = {};
 
     for (const action of actions) {
@@ -52,43 +52,101 @@ export class ContextMenuUI {
       groups[action.category].push(action);
     }
 
+    // First-level menu: categories
+    let subMenuTimeout: any;
+    const hideSubmenu = () => {
+      if (ContextMenuUI.subMenuElement) {
+        document.body.removeChild(ContextMenuUI.subMenuElement);
+        ContextMenuUI.subMenuElement = null;
+      }
+      clearTimeout(subMenuTimeout);
+    };
+
     for (const [category, categoryActions] of Object.entries(groups)) {
-      const header = createStyledElement('div', {
+      const catBtn = createStyledElement('button', {
+        display: 'block',
+        width: '100%',
+        textAlign: 'left',
         fontSize: '14px',
         fontWeight: '700',
-        margin: '8px 0 4px',
-      }, category.charAt(0).toUpperCase() + category.slice(1));
-      container.appendChild(header);
+        padding: '4px 8px',
+        border: 'none',
+        backgroundColor: 'transparent',
+        cursor: 'pointer',
+        marginBottom: '4px',
+      }, category.charAt(0).toUpperCase() + category.slice(1)) as HTMLButtonElement;
 
-      for (const action of categoryActions) {
-        const button = createStyledElement('button', {
-          display: 'block',
-          width: '100%',
-          textAlign: 'left',
-          fontSize: '14px',
-          padding: '4px 8px',
-          border: 'none',
-          backgroundColor: 'transparent',
-          appearance: 'none',
-          outline: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          marginBottom: '4px',
-        }, action.description);
+      catBtn.addEventListener('mouseenter', () => {
+        catBtn.style.backgroundColor = '#f3f4f6';
+        hideSubmenu();
+        const rect = catBtn.getBoundingClientRect();
+        const submenu = createStyledElement('div', {
+          position: 'fixed',
+          top: `${rect.top}px`,
+          left: `${rect.right + 4}px`,
+          background: '#fff',
+          border: '1px solid #000',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+          borderRadius: '8px',
+          padding: '8px',
+          maxHeight: `${window.innerHeight - rect.top - 20}px`,
+          overflowY: 'auto',
+          boxSizing: 'border-box',
+          fontFamily: 'Arial, sans-serif',
+        }) as HTMLDivElement;
 
-        button.addEventListener('mouseenter', () => {
-          button.style.backgroundColor = '#f3f4f6';
-        });
-        button.addEventListener('mouseleave', () => {
-          button.style.backgroundColor = 'transparent';
-        });
-        button.addEventListener('click', () => {
-          actionCallback(action, selection);
-          button.blur();
+        for (const action of categoryActions) {
+          const btn = createStyledElement('button', {
+            display: 'block',
+            width: '100%',
+            textAlign: 'left',
+            fontSize: '14px',
+            padding: '4px 8px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            cursor: 'pointer',
+            marginBottom: '4px',
+          }, action.description) as HTMLButtonElement;
+
+          btn.addEventListener('mouseenter', () => { btn.style.backgroundColor = '#f3f4f6'; });
+          btn.addEventListener('mouseleave', () => { btn.style.backgroundColor = 'transparent'; });
+          btn.addEventListener('click', () => {
+            // Submenu will be hidden by processAction logic if needed, or by global hide.
+            // Do not hide main menu here, let processAction manage the UI for results.
+            actionCallback(action, selection);
+          });
+
+          submenu.appendChild(btn);
+        }
+        document.body.appendChild(submenu);
+        ContextMenuUI.subMenuElement = submenu;
+
+        // Make submenu sticky and interact with category button's hide timeout
+        submenu.addEventListener('mouseenter', () => {
+          clearTimeout(subMenuTimeout); // User entered submenu, cancel hide timer
         });
 
-        container.appendChild(button);
-      }
+        submenu.addEventListener('mouseleave', (e) => {
+          // If mouse moves from submenu to its parent category button, don't hide
+          if (catBtn.contains(e.relatedTarget as Node)) {
+            clearTimeout(subMenuTimeout); // Still safe, effectively
+            return;
+          }
+          // Otherwise, if mouse leaves submenu to somewhere else, set timer to hide
+          subMenuTimeout = setTimeout(hideSubmenu, 300);
+        });
+      });
+
+      catBtn.addEventListener('mouseleave', (e) => {
+        catBtn.style.backgroundColor = 'transparent';
+        // If mouse is leaving catBtn to its own submenu, don't start hide timer
+        if (ContextMenuUI.subMenuElement && ContextMenuUI.subMenuElement.contains(e.relatedTarget as Node)) {
+          return;
+        }
+        subMenuTimeout = setTimeout(hideSubmenu, 300);
+      });
+
+      container.appendChild(catBtn);
     }
 
     // Append container to wrapper and wrapper to body
@@ -111,7 +169,11 @@ export class ContextMenuUI {
     if (!ContextMenuUI.menuElement) {
       return;
     }
-
+    // Remove any open submenu
+    if (ContextMenuUI.subMenuElement) {
+      document.body.removeChild(ContextMenuUI.subMenuElement);
+      ContextMenuUI.subMenuElement = null;
+    }
     document.body.removeChild(ContextMenuUI.menuElement);
     ContextMenuUI.menuElement = null;
     ContextMenuUI.resultPanel = null;
@@ -125,6 +187,10 @@ export class ContextMenuUI {
 
   public static getElement(): HTMLElement | null {
     return ContextMenuUI.menuElement;
+  }
+
+  public static getSubMenuElement(): HTMLElement | null {
+    return ContextMenuUI.subMenuElement;
   }
 
   /**

@@ -70,13 +70,24 @@ export class ContextMenuProcessor {
     // Hide both context menus when clicking outside
     InputContextMenuUI.hide();
     const menuElement = ContextMenuUI.getElement();
-    if (menuElement && !menuElement.contains(targetNode)) {
+    // Also check if the click is outside any open submenu of ContextMenuUI
+    const subMenuElement = ContextMenuUI.getSubMenuElement(); // Assumes ContextMenuUI exposes this
+    let clickedOutsideMainMenu = menuElement && !menuElement.contains(targetNode);
+    let clickedOutsideSubMenu = subMenuElement && !subMenuElement.contains(targetNode);
+
+    // If there's a submenu, hiding decision depends on clicks outside *both*
+    // If no submenu, decision depends only on main menu.
+    if (subMenuElement) {
+      if (clickedOutsideMainMenu && clickedOutsideSubMenu) {
+        ContextMenuUI.hide(); // This will also hide the submenu via its own logic
+      }
+    } else if (clickedOutsideMainMenu) {
       ContextMenuUI.hide();
     }
   };
 
   private handleAction = async (action: Action, selection: string): Promise<void> => {
-    // Delegate UI work to ContextMenuUI.processAction
+    // Delegate UI work to ContextMenuUI.processAction to show results in-panel
     await ContextMenuUI.processAction(this.engine, this.actions, action, selection);
   };
 
