@@ -1,5 +1,6 @@
 import type { Action } from './types';
 import { ContextMenuUI } from './ui/context-menu';
+import { InputContextMenuUI } from './ui/input-context-menu';
 
 /**
  * Processor to handle context menu interactions and actions.
@@ -30,6 +31,14 @@ export class ContextMenuProcessor {
   }
 
   private onContextMenu = (event: MouseEvent): void => {
+    // If right-click on an input or textarea, show input-specific menu
+    const target = event.target as HTMLElement;
+    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+      event.preventDefault();
+      ContextMenuUI.hide();
+      InputContextMenuUI.show(event.clientX, event.clientY, target as HTMLInputElement | HTMLTextAreaElement, this.engine);
+      return;
+    }
     const selectedText = window.getSelection()?.toString().trim();
     if (!selectedText) {
       ContextMenuUI.hide();
@@ -47,8 +56,21 @@ export class ContextMenuProcessor {
   };
 
   private onClickOutside = (event: MouseEvent): void => {
+    const targetNode = event.target as Node;
+    // Ignore clicks inside the input context menu
+    const inputMenu = InputContextMenuUI.getMenuElement();
+    if (inputMenu && inputMenu.contains(targetNode)) {
+      return;
+    }
+    // Ignore clicks inside the prompt overlay
+    const promptOverlay = InputContextMenuUI.getPromptOverlay();
+    if (promptOverlay && promptOverlay.contains(targetNode)) {
+      return;
+    }
+    // Hide both context menus when clicking outside
+    InputContextMenuUI.hide();
     const menuElement = ContextMenuUI.getElement();
-    if (menuElement && !menuElement.contains(event.target as Node)) {
+    if (menuElement && !menuElement.contains(targetNode)) {
       ContextMenuUI.hide();
     }
   };
