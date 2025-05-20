@@ -122,8 +122,16 @@ export class StatusMenuUI {
             cacheExists,
             disableCallback
           );
-        } catch (error) {
+        } catch (error: any) {
           console.error('Download failed:', error);
+          // Alert user based on error type
+          if (error instanceof Error && error.name === 'WebGPUNotAvailableError') {
+            alert(error.message);
+          } else if (error instanceof Error) {
+            alert('Failed to download model: ' + error.message);
+          } else {
+            alert('Failed to download model.');
+          }
           // Show download button again on error
           if (StatusMenuUI.downloadButton) {
             StatusMenuUI.downloadButton.style.display = 'block';
