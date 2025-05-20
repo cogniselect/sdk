@@ -2,6 +2,23 @@
 
 Browser SDK for CogniSelect – context-menu AI features.
 
+
+## Demo
+
+You can try it out on [CogniSelect](https://cogniselect.com).
+
+## Features
+- **Contextual Actions**: Generate summaries, quizzes, and more based on selected text.
+- **Generate your own text on areas/inputs**: Create custom text generation actions.
+- **Prebuilt Models**: Use preconfigured models for various tasks.
+- **Customizable**: Add your own actions and models.
+- **Persistent Cache**: Store models in browser storage for faster access.
+- **Lightweight**: Minimal footprint, designed for in-browser use.
+- **Easy Integration**: Simple API for quick setup and customization.
+- **Cross-Browser Support**: Works on all modern browsers.
+- **Open Source**: Available under the Apache 2.0 License.
+- **Community Driven**: Contributions and feedback are welcome.
+
 ## Installation
 
 ### npm
