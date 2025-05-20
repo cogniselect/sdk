@@ -30,6 +30,10 @@ export class IndicatorUI {
     const icon = createStyledElement('div', {
       width: '24px',
       height: '24px',
+      boxSizing: 'border-box',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
       borderRadius: '50%',
       background: '#fff',
       border: '2px solid #000',
