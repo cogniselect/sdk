@@ -85,7 +85,7 @@ npm run build
 
 ## Acknowledgements
 
-This project would not be possible without the excellent work of [mlc-ai/web-llm](https://github.com/mlc-ai/web-llm), which provides the core in-browser LLM engine. We gratefully acknowledge their contribution. (Required by Apache 2.0 license.)
+This project would not be possible without the excellent work of [mlc-ai/web-llm](https://github.com/mlc-ai/web-llm), which provides the core in-browser LLM engine. We gratefully acknowledge their contribution.
 
 ## License
 
