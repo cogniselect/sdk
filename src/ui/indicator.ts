@@ -3,6 +3,7 @@ import { createStyledElement } from './dom-utils';
 export class IndicatorUI {
   private static wrapper: HTMLDivElement | null = null;
   private static statusText: HTMLDivElement | null = null;
+  private static iconEl: HTMLDivElement | null = null;
 
   public static create(container: HTMLElement, onClick: () => void): HTMLDivElement {
     if (IndicatorUI.wrapper) {
@@ -47,6 +48,7 @@ export class IndicatorUI {
 
     IndicatorUI.wrapper = wrapper;
     IndicatorUI.statusText = status;
+    IndicatorUI.iconEl = icon;
 
     return wrapper;
   }
@@ -66,5 +68,26 @@ export class IndicatorUI {
     IndicatorUI.wrapper.parentElement.removeChild(IndicatorUI.wrapper);
     IndicatorUI.wrapper = null;
     IndicatorUI.statusText = null;
+    IndicatorUI.iconEl = null;
+  }
+
+  public static showLoading(): void {
+    if (!IndicatorUI.iconEl) return;
+    IndicatorUI.iconEl.style.border = '2px solid transparent';
+    IndicatorUI.iconEl.style.background = 'transparent';
+    IndicatorUI.iconEl.innerHTML = `
+      <svg width="24" height="24" viewBox="0 0 50 50">
+        <circle cx="25" cy="25" r="20" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-dasharray="31.4 31.4">
+          <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite" />
+        </circle>
+      </svg>
+    `;
+  }
+
+  public static hideLoading(): void {
+    if (!IndicatorUI.iconEl) return;
+    IndicatorUI.iconEl.innerHTML = '';
+    IndicatorUI.iconEl.style.border = '2px solid #000';
+    IndicatorUI.iconEl.style.background = '#fff';
   }
 } 

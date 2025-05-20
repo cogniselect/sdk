@@ -39,7 +39,15 @@ export class CogniSelect {
     }
 
     this.indicatorWrapperEl = IndicatorUI.create(container as HTMLElement, async () => {
-      await this.toggleStatusMenu();
+      // show loading spinner while menu toggles
+      IndicatorUI.showLoading();
+      // allow spinner to render before heavy work
+      await new Promise(requestAnimationFrame);
+      try {
+        await this.toggleStatusMenu();
+      } finally {
+        IndicatorUI.hideLoading();
+      }
     });
 
     return this;

@@ -58,6 +58,12 @@ export class StatusMenuUI {
         marginBottom: '4px',
       }, 'Enable') as HTMLButtonElement;
 
+      // Add hover highlight effect to download button
+      if (StatusMenuUI.downloadButton) {
+        StatusMenuUI.downloadButton.addEventListener('mouseenter', () => { StatusMenuUI.downloadButton!.style.backgroundColor = '#f3f4f6'; });
+        StatusMenuUI.downloadButton.addEventListener('mouseleave', () => { StatusMenuUI.downloadButton!.style.backgroundColor = 'transparent'; });
+      }
+
       // Create progress container (initially hidden)
       StatusMenuUI.progressContainer = createStyledElement('div', {
         width: '100%',
@@ -170,6 +176,10 @@ export class StatusMenuUI {
         }
       });
 
+      // Add hover highlight effect to clear cache button
+      clearCacheBtn.addEventListener('mouseenter', () => { clearCacheBtn.style.backgroundColor = '#f3f4f6'; });
+      clearCacheBtn.addEventListener('mouseleave', () => { clearCacheBtn.style.backgroundColor = 'transparent'; });
+
       menu.appendChild(StatusMenuUI.downloadButton);
       menu.appendChild(StatusMenuUI.progressContainer);
       menu.appendChild(clearCacheBtn);
@@ -212,6 +222,11 @@ export class StatusMenuUI {
           disableCallback
         );
       });
+
+      // Add hover highlight effect to disable button
+      disableBtn.addEventListener('mouseenter', () => { disableBtn.style.backgroundColor = '#f3f4f6'; });
+      disableBtn.addEventListener('mouseleave', () => { disableBtn.style.backgroundColor = 'transparent'; });
+
       menu.appendChild(disableBtn);
     }
 
@@ -231,6 +246,11 @@ export class StatusMenuUI {
     editBtn.addEventListener('click', () => {
       ActionEditorUI.show(actions, onSave);
     });
+
+    // Add hover highlight effect to edit button
+    editBtn.addEventListener('mouseenter', () => { editBtn.style.backgroundColor = '#f3f4f6'; });
+    editBtn.addEventListener('mouseleave', () => { editBtn.style.backgroundColor = 'transparent'; });
+
     menu.appendChild(editBtn);
 
     const divider = document.createElement('hr');
