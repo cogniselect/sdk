@@ -115,11 +115,27 @@ export class CogniSelect {
           this.contextMenuProcessor.updateActions(this.actions);
         }
       },
-      this.config.model
-    , this.config.cacheStrategy
-    , this.modelList
-    , cacheExists
+      this.config.model,
+      this.config.cacheStrategy,
+      this.modelList,
+      cacheExists,
+      this.disableModel.bind(this)
     );
+  }
+
+  /**
+   * Disables the model and detaches context menu listeners.
+   */
+  private disableModel(): void {
+    if (this.contextMenuProcessor) {
+      this.contextMenuProcessor.detach();
+      this.contextMenuProcessor = null;
+    }
+    if (this.statusMenuEl) {
+      StatusMenuUI.hide();
+      this.statusMenuEl = null;
+    }
+    this.engine = null;
   }
 
   // Removes the status dropdown menu

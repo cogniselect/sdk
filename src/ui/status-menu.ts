@@ -20,7 +20,8 @@ export class StatusMenuUI {
     modelId: string,
     cacheStrategy: string,
     modelList: any[],
-    cacheExists: boolean
+    cacheExists: boolean,
+    disableCallback: () => Promise<void> | void
   ): HTMLDivElement {
     if (StatusMenuUI.menuElement) {
       StatusMenuUI.hide();
@@ -55,7 +56,7 @@ export class StatusMenuUI {
         fontFamily: 'Arial, sans-serif',
         color: '#000',
         marginBottom: '4px',
-      }, cacheExists ? 'Load from cache' : 'Download model') as HTMLButtonElement;
+      }, 'Enable') as HTMLButtonElement;
 
       // Create progress container (initially hidden)
       StatusMenuUI.progressContainer = createStyledElement('div', {
@@ -107,22 +108,20 @@ export class StatusMenuUI {
             console.log(`Progress: ${loaded}/${total} MB`);
             StatusMenuUI.updateProgress(loaded, total);
           });
-
-          // Update status text after download completes
-          const statusEl = menu.querySelector('.status-text');
-          if (statusEl) {
-            statusEl.textContent = 'Status: Running';
-          }
-          
-          // Show the tip now that the model is running
-          const tipElDynamic = menu.querySelector<HTMLElement>('.status-tip');
-          if (tipElDynamic) {
-            tipElDynamic.style.display = 'block';
-          }
-          // Hide progress bar after loading completes
-          if (StatusMenuUI.progressContainer) {
-            StatusMenuUI.progressContainer.style.display = 'none';
-          }
+          // Re-render menu now that the model is running to show Disable in proper position
+          StatusMenuUI.show(
+            anchorEl,
+            true,
+            getModelSize,
+            downloadAndActivate,
+            actions,
+            onSave,
+            modelId,
+            cacheStrategy,
+            modelList,
+            cacheExists,
+            disableCallback
+          );
         } catch (error) {
           console.error('Download failed:', error);
           // Show download button again on error
@@ -159,13 +158,53 @@ export class StatusMenuUI {
         await deleteModelAllInfoInCache(modelId, appConfig);
         clearCacheBtn.disabled = true;
         if (StatusMenuUI.downloadButton) {
-          StatusMenuUI.downloadButton.textContent = 'Download model';
+          StatusMenuUI.downloadButton.textContent = 'Enable';
         }
       });
 
       menu.appendChild(StatusMenuUI.downloadButton);
       menu.appendChild(StatusMenuUI.progressContainer);
       menu.appendChild(clearCacheBtn);
+    }
+
+    // When already initialized, offer disable option
+    if (isInitialized) {
+      const disableBtn = createStyledElement('button', {
+        display: 'block',
+        width: '100%',
+        textAlign: 'left',
+        fontSize: '14px',
+        padding: '4px 8px',
+        border: 'none',
+        backgroundColor: 'transparent',
+        cursor: 'pointer',
+        fontFamily: 'Arial, sans-serif',
+        color: '#000',
+        marginBottom: '4px',
+      }, 'Disable') as HTMLButtonElement;
+      disableBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        try {
+          await disableCallback();
+        } catch (err) {
+          console.error('Disable failed:', err);
+        }
+        // Re-render menu now that the model is disabled to show Enable
+        StatusMenuUI.show(
+          anchorEl,
+          false,
+          getModelSize,
+          downloadAndActivate,
+          actions,
+          onSave,
+          modelId,
+          cacheStrategy,
+          modelList,
+          cacheExists,
+          disableCallback
+        );
+      });
+      menu.appendChild(disableBtn);
     }
 
     const editBtn = createStyledElement('button', {
